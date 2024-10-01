@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gyroscope Ball Game</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      background-color: #f0f0f0;
+    }
+    #ball {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #ff5722;
+      position: absolute;
+    }
+  </style>
+</head>
+<body>
+
+<div id="ball"></div>
+
+<script>
+  const ball = document.getElementById('ball');
+  const ballSize = 50;
+  let ballX = window.innerWidth / 2 - ballSize / 2;
+  let ballY = window.innerHeight / 2 - ballSize / 2;
+
+  ball.style.left = ballX + 'px';
+  ball.style.top = ballY + 'px';
+
+  function handleOrientation(event) {
+    const gamma = event.gamma; // Left to right
+    const beta = event.beta;   // Front to back
+
+    ballX += gamma * 0.5;
+    ballY += beta * 0.5;
+
+    if (ballX < 0) ballX = 0;
+    if (ballX > window.innerWidth - ballSize) ballX = window.innerWidth - ballSize;
+    if (ballY < 0) ballY = 0;
+    if (ballY > window.innerHeight - ballSize) ballY = window.innerHeight - ballSize;
+
+    ball.style.left = ballX + 'px';
+    ball.style.top = ballY + 'px';
+  }
+
+  // Request permission for iOS (Safari)
+  function requestGyroscopePermission() {
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      DeviceOrientationEvent.requestPermission()
+        .then(permissionState => {
+          if (permissionState === 'granted') {
+            window.addEventListener('deviceorientation', handleOrientation);
+          } else {
+            alert("Gyroscope access denied.");
+          }
+        })
+        .catch(console.error);
+    } else {
+      // For browsers that don't need explicit permission (like Chrome)
+      window.addEventListener('deviceorientation', handleOrientation);
+    }
+  }
+
+  // Check if we need to ask for permission (iOS specific)
+  window.onload = function() {
+    requestGyroscopePermission();
+  };
+</script>
+
+</body>
+</html>
